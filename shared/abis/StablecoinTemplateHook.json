@@ -1,0 +1,90 @@
+[
+  {
+    "type": "event",
+    "name": "FeeUpdated",
+    "inputs": [
+      { "name": "templateId", "type": "bytes32", "indexed": true },
+      { "name": "poolId", "type": "bytes32", "indexed": true },
+      { "name": "oldFee", "type": "uint24", "indexed": false },
+      { "name": "newFee", "type": "uint24", "indexed": false }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "GuardTriggered",
+    "inputs": [
+      { "name": "templateId", "type": "bytes32", "indexed": true },
+      { "name": "poolId", "type": "bytes32", "indexed": true },
+      { "name": "guard", "type": "bytes32", "indexed": true },
+      { "name": "contextValue", "type": "int256", "indexed": false }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "function",
+    "name": "scheduleTemplateConfigUpdate",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      {
+        "name": "newConfig",
+        "type": "tuple",
+        "components": [
+          {
+            "name": "base",
+            "type": "tuple",
+            "components": [
+              { "name": "maxTradeSize", "type": "uint256" },
+              { "name": "rateLimitWindow", "type": "uint32" },
+              { "name": "maxSwapsPerWindow", "type": "uint16" },
+              { "name": "cooldownSeconds", "type": "uint32" },
+              { "name": "configUpdateDelay", "type": "uint32" }
+            ]
+          },
+          { "name": "normalFee", "type": "uint24" },
+          { "name": "stressFee", "type": "uint24" },
+          { "name": "extremeFee", "type": "uint24" },
+          { "name": "stressDeviation", "type": "uint24" },
+          { "name": "extremeDeviation", "type": "uint24" },
+          { "name": "circuitBreakerDeviation", "type": "uint24" },
+          { "name": "volatilityThreshold", "type": "uint24" },
+          { "name": "circuitBreakerEnabled", "type": "bool" }
+        ]
+      }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "applyTemplateConfigUpdate",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      {
+        "name": "newConfig",
+        "type": "tuple",
+        "components": [
+          {
+            "name": "base",
+            "type": "tuple",
+            "components": [
+              { "name": "maxTradeSize", "type": "uint256" },
+              { "name": "rateLimitWindow", "type": "uint32" },
+              { "name": "maxSwapsPerWindow", "type": "uint16" },
+              { "name": "cooldownSeconds", "type": "uint32" },
+              { "name": "configUpdateDelay", "type": "uint32" }
+            ]
+          },
+          { "name": "normalFee", "type": "uint24" },
+          { "name": "stressFee", "type": "uint24" },
+          { "name": "extremeFee", "type": "uint24" },
+          { "name": "stressDeviation", "type": "uint24" },
+          { "name": "extremeDeviation", "type": "uint24" },
+          { "name": "circuitBreakerDeviation", "type": "uint24" },
+          { "name": "volatilityThreshold", "type": "uint24" },
+          { "name": "circuitBreakerEnabled", "type": "bool" }
+        ]
+      }
+    ],
+    "outputs": []
+  }
+]

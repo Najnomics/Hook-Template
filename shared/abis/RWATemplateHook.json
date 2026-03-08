@@ -1,0 +1,23 @@
+[
+  {
+    "type": "event",
+    "name": "GuardTriggered",
+    "inputs": [
+      { "name": "templateId", "type": "bytes32", "indexed": true },
+      { "name": "poolId", "type": "bytes32", "indexed": true },
+      { "name": "guard", "type": "bytes32", "indexed": true },
+      { "name": "contextValue", "type": "int256", "indexed": false }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "function",
+    "name": "setAllowlist",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "name": "accounts", "type": "address[]" },
+      { "name": "allowed", "type": "bool" }
+    ],
+    "outputs": []
+  }
+]

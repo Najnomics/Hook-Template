@@ -1,0 +1,228 @@
+[
+  {
+    "type": "event",
+    "name": "TemplateDeployed",
+    "inputs": [
+      { "name": "templateId", "type": "bytes32", "indexed": true },
+      { "name": "hook", "type": "address", "indexed": true },
+      { "name": "admin", "type": "address", "indexed": true },
+      { "name": "configHash", "type": "bytes32", "indexed": false }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "function",
+    "name": "mineStablecoinSalt",
+    "stateMutability": "view",
+    "inputs": [
+      { "name": "manager", "type": "address" },
+      { "name": "admin", "type": "address" },
+      {
+        "name": "config",
+        "type": "tuple",
+        "components": [
+          {
+            "name": "base",
+            "type": "tuple",
+            "components": [
+              { "name": "maxTradeSize", "type": "uint256" },
+              { "name": "rateLimitWindow", "type": "uint32" },
+              { "name": "maxSwapsPerWindow", "type": "uint16" },
+              { "name": "cooldownSeconds", "type": "uint32" },
+              { "name": "configUpdateDelay", "type": "uint32" }
+            ]
+          },
+          { "name": "normalFee", "type": "uint24" },
+          { "name": "stressFee", "type": "uint24" },
+          { "name": "extremeFee", "type": "uint24" },
+          { "name": "stressDeviation", "type": "uint24" },
+          { "name": "extremeDeviation", "type": "uint24" },
+          { "name": "circuitBreakerDeviation", "type": "uint24" },
+          { "name": "volatilityThreshold", "type": "uint24" },
+          { "name": "circuitBreakerEnabled", "type": "bool" }
+        ]
+      }
+    ],
+    "outputs": [
+      { "name": "hookAddress", "type": "address" },
+      { "name": "salt", "type": "bytes32" }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "mineRWASalt",
+    "stateMutability": "view",
+    "inputs": [
+      { "name": "manager", "type": "address" },
+      { "name": "admin", "type": "address" },
+      {
+        "name": "config",
+        "type": "tuple",
+        "components": [
+          {
+            "name": "base",
+            "type": "tuple",
+            "components": [
+              { "name": "maxTradeSize", "type": "uint256" },
+              { "name": "rateLimitWindow", "type": "uint32" },
+              { "name": "maxSwapsPerWindow", "type": "uint16" },
+              { "name": "cooldownSeconds", "type": "uint32" },
+              { "name": "configUpdateDelay", "type": "uint32" }
+            ]
+          },
+          { "name": "sessionFee", "type": "uint24" },
+          { "name": "maxTickJump", "type": "uint16" },
+          { "name": "maxSlippageBps", "type": "uint16" },
+          { "name": "sessionOpenSeconds", "type": "uint32" },
+          { "name": "sessionCloseSeconds", "type": "uint32" },
+          { "name": "permissionedOnly", "type": "bool" }
+        ]
+      }
+    ],
+    "outputs": [
+      { "name": "hookAddress", "type": "address" },
+      { "name": "salt", "type": "bytes32" }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "mineLongTailSalt",
+    "stateMutability": "view",
+    "inputs": [
+      { "name": "manager", "type": "address" },
+      { "name": "admin", "type": "address" },
+      {
+        "name": "config",
+        "type": "tuple",
+        "components": [
+          {
+            "name": "base",
+            "type": "tuple",
+            "components": [
+              { "name": "maxTradeSize", "type": "uint256" },
+              { "name": "rateLimitWindow", "type": "uint32" },
+              { "name": "maxSwapsPerWindow", "type": "uint16" },
+              { "name": "cooldownSeconds", "type": "uint32" },
+              { "name": "configUpdateDelay", "type": "uint32" }
+            ]
+          },
+          { "name": "launchFee", "type": "uint24" },
+          { "name": "normalFee", "type": "uint24" },
+          { "name": "launchDuration", "type": "uint32" },
+          { "name": "initialMaxTrade", "type": "uint256" },
+          { "name": "finalMaxTrade", "type": "uint256" },
+          { "name": "volumeTransitionThreshold", "type": "uint256" },
+          { "name": "perBlockVolumeCap", "type": "uint256" },
+          { "name": "segmentedOrderFlow", "type": "bool" }
+        ]
+      }
+    ],
+    "outputs": [
+      { "name": "hookAddress", "type": "address" },
+      { "name": "salt", "type": "bytes32" }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "deployStablecoin",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "name": "manager", "type": "address" },
+      {
+        "name": "config",
+        "type": "tuple",
+        "components": [
+          {
+            "name": "base",
+            "type": "tuple",
+            "components": [
+              { "name": "maxTradeSize", "type": "uint256" },
+              { "name": "rateLimitWindow", "type": "uint32" },
+              { "name": "maxSwapsPerWindow", "type": "uint16" },
+              { "name": "cooldownSeconds", "type": "uint32" },
+              { "name": "configUpdateDelay", "type": "uint32" }
+            ]
+          },
+          { "name": "normalFee", "type": "uint24" },
+          { "name": "stressFee", "type": "uint24" },
+          { "name": "extremeFee", "type": "uint24" },
+          { "name": "stressDeviation", "type": "uint24" },
+          { "name": "extremeDeviation", "type": "uint24" },
+          { "name": "circuitBreakerDeviation", "type": "uint24" },
+          { "name": "volatilityThreshold", "type": "uint24" },
+          { "name": "circuitBreakerEnabled", "type": "bool" }
+        ]
+      },
+      { "name": "salt", "type": "bytes32" }
+    ],
+    "outputs": [{ "name": "hook", "type": "address" }]
+  },
+  {
+    "type": "function",
+    "name": "deployRWA",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "name": "manager", "type": "address" },
+      {
+        "name": "config",
+        "type": "tuple",
+        "components": [
+          {
+            "name": "base",
+            "type": "tuple",
+            "components": [
+              { "name": "maxTradeSize", "type": "uint256" },
+              { "name": "rateLimitWindow", "type": "uint32" },
+              { "name": "maxSwapsPerWindow", "type": "uint16" },
+              { "name": "cooldownSeconds", "type": "uint32" },
+              { "name": "configUpdateDelay", "type": "uint32" }
+            ]
+          },
+          { "name": "sessionFee", "type": "uint24" },
+          { "name": "maxTickJump", "type": "uint16" },
+          { "name": "maxSlippageBps", "type": "uint16" },
+          { "name": "sessionOpenSeconds", "type": "uint32" },
+          { "name": "sessionCloseSeconds", "type": "uint32" },
+          { "name": "permissionedOnly", "type": "bool" }
+        ]
+      },
+      { "name": "salt", "type": "bytes32" }
+    ],
+    "outputs": [{ "name": "hook", "type": "address" }]
+  },
+  {
+    "type": "function",
+    "name": "deployLongTail",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "name": "manager", "type": "address" },
+      {
+        "name": "config",
+        "type": "tuple",
+        "components": [
+          {
+            "name": "base",
+            "type": "tuple",
+            "components": [
+              { "name": "maxTradeSize", "type": "uint256" },
+              { "name": "rateLimitWindow", "type": "uint32" },
+              { "name": "maxSwapsPerWindow", "type": "uint16" },
+              { "name": "cooldownSeconds", "type": "uint32" },
+              { "name": "configUpdateDelay", "type": "uint32" }
+            ]
+          },
+          { "name": "launchFee", "type": "uint24" },
+          { "name": "normalFee", "type": "uint24" },
+          { "name": "launchDuration", "type": "uint32" },
+          { "name": "initialMaxTrade", "type": "uint256" },
+          { "name": "finalMaxTrade", "type": "uint256" },
+          { "name": "volumeTransitionThreshold", "type": "uint256" },
+          { "name": "perBlockVolumeCap", "type": "uint256" },
+          { "name": "segmentedOrderFlow", "type": "bool" }
+        ]
+      },
+      { "name": "salt", "type": "bytes32" }
+    ],
+    "outputs": [{ "name": "hook", "type": "address" }]
+  }
+]
