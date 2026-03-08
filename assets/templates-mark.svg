@@ -1,0 +1,7 @@
+<svg width="148" height="32" viewBox="0 0 148 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="148" height="32" rx="8" fill="#0F766E"/>
+  <rect x="10" y="8" width="8" height="16" rx="2" fill="#D1FAE5"/>
+  <rect x="21" y="12" width="8" height="12" rx="2" fill="#A7F3D0"/>
+  <rect x="32" y="5" width="8" height="19" rx="2" fill="#6EE7B7"/>
+  <text x="46" y="21" fill="#ECFEFF" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600">HOOK TEMPLATES</text>
+</svg>

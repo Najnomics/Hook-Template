@@ -1,0 +1,6 @@
+<svg width="140" height="32" viewBox="0 0 140 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="140" height="32" rx="8" fill="#111827"/>
+  <path d="M16 22C20 10 24 9 28 15C25 15 23.7 16.9 22.9 18.7C24.6 17.7 26.8 17.2 29.2 18.1C26.4 19.8 24.2 22.3 23 25H16V22Z" fill="#FF2AC3"/>
+  <circle cx="30" cy="11" r="2" fill="#FF2AC3"/>
+  <text x="40" y="21" fill="#F9FAFB" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600">UNISWAP V4</text>
+</svg>
