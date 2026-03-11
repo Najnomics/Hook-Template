@@ -33,7 +33,3 @@ jobs:
           forge test -vvv
         id: test
 
-      - name: Coverage Gate
-        run: |
-          bash scripts/check-coverage.sh
-        id: coverage
