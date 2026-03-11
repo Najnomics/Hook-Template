@@ -54,13 +54,13 @@ contract RWATemplateHook is BaseTemplateHook {
 
     function scheduleTemplateConfigUpdate(RWATemplateConfig calldata newConfig) external onlyAdmin {
         _validateTemplateConfig(newConfig);
-        _stageConfigHash(keccak256(abi.encode(newConfig)));
+        _stageTemplateConfigHash(keccak256(abi.encode(newConfig)));
     }
 
     function applyTemplateConfigUpdate(RWATemplateConfig calldata newConfig) external onlyAdmin {
         _validateTemplateConfig(newConfig);
         bytes32 configHash = keccak256(abi.encode(newConfig));
-        _consumeStagedConfigHash(configHash);
+        _consumeStagedTemplateConfigHash(configHash);
 
         config = newConfig;
         baseConfig = newConfig.base;
@@ -68,20 +68,21 @@ contract RWATemplateHook is BaseTemplateHook {
         emit ConfigUpdated(_templateId(), supportedPoolId, configHash, block.timestamp);
     }
 
-    function _beforeSwap(address sender, PoolKey calldata key, SwapParams calldata params, bytes calldata hookData)
+    function _beforeSwap(address sender, PoolKey calldata key, SwapParams calldata params, bytes calldata)
         internal
         override
         nonReentrantHook
         returns (bytes4, BeforeSwapDelta, uint24)
     {
-        (PoolId poolId, uint256 tradeSize) = _sharedBeforeSwap(key, params, guardState);
+        (PoolId poolId,) = _sharedBeforeSwap(key, params, guardState);
 
         if (!TemplateGuards.inSession(config.sessionOpenSeconds, config.sessionCloseSeconds)) {
             _revertGuard(GUARD_RWA_SESSION);
         }
 
-        address actor = _extractActor(sender, hookData);
-        if (config.permissionedOnly && !allowlisted[actor]) {
+        // `sender` is the direct caller of `PoolManager.swap`, typically a router.
+        // We intentionally do not trust arbitrary `hookData` for identity.
+        if (config.permissionedOnly && !allowlisted[sender]) {
             _revertGuard(GUARD_RWA_ALLOWLIST);
         }
 
@@ -90,9 +91,9 @@ contract RWATemplateHook is BaseTemplateHook {
             _revertGuard(GUARD_RWA_TICK_JUMP);
         }
 
-        // Lightweight slippage guardrail: cap notional aggressiveness relative to configured max trade.
-        uint256 impliedBps = (tradeSize * 10_000) / baseConfig.maxTradeSize;
-        if (impliedBps > config.maxSlippageBps) {
+        // Slippage proxy: track recent tick movement in basis points (1 tick ~= 1 bps).
+        uint256 slippageBps = _tickDistance(currentTick, lastObservedTick);
+        if (lastObservedTick != 0 && slippageBps > config.maxSlippageBps) {
             _revertGuard(GUARD_RWA_SLIPPAGE);
         }
 

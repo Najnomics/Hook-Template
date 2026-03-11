@@ -23,7 +23,7 @@ abstract contract TemplateDemoBase is Script {
     address internal constant CREATE2_DEPLOYER = 0x4e59b44847b379578588920cA78FbF26c0B4956C;
 
     struct DemoStack {
-        PoolManager manager;
+        IPoolManager manager;
         PoolSwapTest swapRouter;
         PoolModifyLiquidityTest liquidityRouter;
         MockERC20 token0;
@@ -32,7 +32,15 @@ abstract contract TemplateDemoBase is Script {
     }
 
     function _deployCore(address trader) internal returns (DemoStack memory stack) {
-        stack.manager = new PoolManager(trader);
+        address configuredManager = vm.envOr("POOL_MANAGER_ADDRESS", address(0));
+        bool requireExternalManager = vm.envOr("REQUIRE_EXTERNAL_POOL_MANAGER", false);
+        if (configuredManager != address(0)) {
+            stack.manager = IPoolManager(configuredManager);
+        } else {
+            require(!requireExternalManager, "POOL_MANAGER_ADDRESS_REQUIRED");
+            stack.manager = IPoolManager(address(new PoolManager(trader)));
+        }
+
         stack.swapRouter = new PoolSwapTest(stack.manager);
         stack.liquidityRouter = new PoolModifyLiquidityTest(stack.manager);
 

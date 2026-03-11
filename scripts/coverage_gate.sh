@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-THRESHOLD="${COVERAGE_THRESHOLD:-70}"
+THRESHOLD="${COVERAGE_THRESHOLD:-100}"
 TMP_FILE="$(mktemp)"
+trap 'rm -f "$TMP_FILE"' EXIT
 
-forge coverage --report summary > "$TMP_FILE"
+# Foundry may panic on some macOS setups when online signature lookup is enabled.
+# Default to offline mode for deterministic CI/local coverage unless explicitly overridden.
+FOUNDRY_OFFLINE="${FOUNDRY_OFFLINE:-true}" \
+  forge coverage --report summary --exclude-tests --no-match-coverage 'script/' > "$TMP_FILE"
 TOTAL_LINE="$(rg '^\| Total\s+' "$TMP_FILE" || true)"
 if [[ -z "$TOTAL_LINE" ]]; then
   echo "[coverage-gate] ERROR: could not parse coverage summary" >&2

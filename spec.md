@@ -112,4 +112,12 @@ sequenceDiagram
 - Wrapper shell scripts under `/scripts` provide local/testnet demo commands and print tx hashes + explorer URLs from broadcast artifacts
 
 ## 10. Assumptions
-Requested `/context/uniswap/**` and `/context/atrium/**` were not present at implementation time. This spec reconciles against pinned local `lib/v4-core` and `lib/v4-periphery`.
+Context is now available and reconciliation has been performed against:
+- `/context/uniswap_docs/docs/docs/contracts/v4/concepts/hooks.mdx`
+- `/context/uniswap_docs/docs/docs/contracts/v4/guides/hooks/hook-deployment.mdx`
+- `/context/uniswap_docs/docs/docs/contracts/v4/guides/accessing-msg.sender-using-hook.mdx`
+- `/context/HOOKS_QUICK_REFERENCE.md`
+- `/context/REACTIVE_HOOKS_ARCHITECTURE.md`
+- `/context/REACTIVE_HOOKS_ARCHITECTURE_PART2.md`
+
+`context/uniswap_docs` is used as the effective `/context/uniswap` source bundle.

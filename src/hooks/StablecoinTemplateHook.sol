@@ -42,13 +42,13 @@ contract StablecoinTemplateHook is BaseTemplateHook {
 
     function scheduleTemplateConfigUpdate(StablecoinTemplateConfig calldata newConfig) external onlyAdmin {
         _validateTemplateConfig(newConfig);
-        _stageConfigHash(keccak256(abi.encode(newConfig)));
+        _stageTemplateConfigHash(keccak256(abi.encode(newConfig)));
     }
 
     function applyTemplateConfigUpdate(StablecoinTemplateConfig calldata newConfig) external onlyAdmin {
         _validateTemplateConfig(newConfig);
         bytes32 configHash = keccak256(abi.encode(newConfig));
-        _consumeStagedConfigHash(configHash);
+        _consumeStagedTemplateConfigHash(configHash);
 
         config = newConfig;
         baseConfig = newConfig.base;

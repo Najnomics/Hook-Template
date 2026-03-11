@@ -12,24 +12,23 @@ EXPLORER_PREFIX="$3"
 
 RUN_FILE="broadcast/${SCRIPT_FILE}/${CHAIN_ID}/run-latest.json"
 if [[ ! -f "$RUN_FILE" ]]; then
-  echo "[demo] WARNING: broadcast output not found at ${RUN_FILE}" >&2
+  ALT_RUN_FILE="broadcast/$(basename "$SCRIPT_FILE")/${CHAIN_ID}/run-latest.json"
+  if [[ -f "$ALT_RUN_FILE" ]]; then
+    RUN_FILE="$ALT_RUN_FILE"
+  else
+    echo "[demo] WARNING: broadcast output not found at ${RUN_FILE}" >&2
+    exit 0
+  fi
+fi
+
+HASHES="$(jq -r '.transactions[]? | (.hash // .transactionHash // .txHash // empty)' "$RUN_FILE")"
+if [[ -z "$HASHES" ]]; then
+  echo "[demo] No transactions in ${RUN_FILE}"
   exit 0
 fi
 
-node - "$RUN_FILE" "$EXPLORER_PREFIX" <<'NODE'
-const fs = require("fs");
-const file = process.argv[2];
-const explorer = process.argv[3];
-const json = JSON.parse(fs.readFileSync(file, "utf8"));
-const txs = Array.isArray(json.transactions) ? json.transactions : [];
-if (txs.length === 0) {
-  console.log(`[demo] No transactions in ${file}`);
-  process.exit(0);
-}
-for (const tx of txs) {
-  const hash = tx.hash || tx.transactionHash || tx.txHash;
-  if (!hash) continue;
-  console.log(`[demo] tx: ${hash}`);
-  console.log(`[demo] explorer: ${explorer}${hash}`);
-}
-NODE
+while IFS= read -r HASH; do
+  [[ -z "$HASH" ]] && continue
+  echo "[demo] tx: ${HASH}"
+  echo "[demo] explorer: ${EXPLORER_PREFIX}${HASH}"
+done <<< "$HASHES"

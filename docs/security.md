@@ -13,6 +13,7 @@ Adversarial:
 - admin-gated config updates with optional delay
 - rate-limit, cooldown, max-trade guards
 - template-specific controls (allowlist/session/launch-mode)
+- RWA allowlist checks the direct `PoolManager.swap` caller (`sender`) and does not trust arbitrary `hookData` for identity
 
 ## Threat Coverage (non-exhaustive)
 - Stablecoin depeg toxic flow: fee elevation + circuit-breaker-lite cooldown
@@ -23,5 +24,6 @@ Adversarial:
 - oracle-free fee proxies rely on internal state/tick behavior
 - operational risk in config misconfiguration
 - off-chain automation/frontends may introduce integration risk
+- if EOAs must be allowlisted behind routers, use a trusted-router pattern (`msgSender()`), not raw hookData decoding
 
 System is not attack-proof.

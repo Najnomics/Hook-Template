@@ -28,7 +28,7 @@ contract EdgeCasesTest is BaseTemplateTest, TemplateDeployers {
         _mintAndApprove(alice, STARTING_BALANCE);
     }
 
-    function test_ZeroLiquidityPoolSwapReverts() public {
+    function test_ZeroLiquidityPoolSwapReturnsZeroDelta() public {
         PoolManager freshManager = new PoolManager(address(this));
         StablecoinTemplateConfig memory cfg = defaultStablecoinConfig();
 

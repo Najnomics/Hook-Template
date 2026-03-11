@@ -2,7 +2,6 @@
 pragma solidity ^0.8.26;
 
 import {IHooks} from "@uniswap/v4-core/src/interfaces/IHooks.sol";
-import {IPoolManager} from "@uniswap/v4-core/src/interfaces/IPoolManager.sol";
 import {PoolKey} from "@uniswap/v4-core/src/types/PoolKey.sol";
 import {TemplateDemoBase} from "./base/TemplateDemoBase.s.sol";
 import {RWATemplateHook} from "../src/hooks/RWATemplateHook.sol";
@@ -22,7 +21,7 @@ contract DemoRWAScript is TemplateDemoBase {
                 maxTradeSize: 150_000 ether,
                 rateLimitWindow: 600,
                 maxSwapsPerWindow: 30,
-                cooldownSeconds: 30,
+                cooldownSeconds: 0,
                 configUpdateDelay: 0
             }),
             sessionFee: 2_500,
@@ -33,9 +32,9 @@ contract DemoRWAScript is TemplateDemoBase {
             permissionedOnly: true
         });
 
-        bytes memory args = abi.encode(IPoolManager(address(stack.manager)), trader, cfg);
+        bytes memory args = abi.encode(stack.manager, trader, cfg);
         bytes32 salt = _mineSalt(type(RWATemplateHook).creationCode, args);
-        RWATemplateHook hook = new RWATemplateHook{salt: salt}(IPoolManager(address(stack.manager)), trader, cfg);
+        RWATemplateHook hook = new RWATemplateHook{salt: salt}(stack.manager, trader, cfg);
 
         address[] memory allowlist = new address[](1);
         allowlist[0] = address(stack.swapRouter);

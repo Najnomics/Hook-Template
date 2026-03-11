@@ -33,10 +33,10 @@ contract IntegrationLifecycleTest is BaseTemplateTest, TemplateDeployers {
         _mintAndApprove(alice, STARTING_BALANCE);
 
         address[] memory allowlist = new address[](1);
-        allowlist[0] = alice;
+        allowlist[0] = address(swapRouter);
         hook.setAllowlist(allowlist, true);
 
-        _swapExactIn(alice, 10_000 ether, true, abi.encodePacked(alice));
+        _swapExactIn(alice, 10_000 ether, true, bytes(""));
 
         RWATemplateConfig memory cfg = defaultRWAConfig();
         cfg.sessionOpenSeconds = 1;
@@ -46,7 +46,7 @@ contract IntegrationLifecycleTest is BaseTemplateTest, TemplateDeployers {
 
         vm.warp(100);
         vm.expectRevert();
-        _swapExactIn(alice, 2_000 ether, true, abi.encodePacked(alice));
+        _swapExactIn(alice, 2_000 ether, true, bytes(""));
     }
 
     function test_LongTailLifecycleE2E() public {

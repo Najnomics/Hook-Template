@@ -36,8 +36,12 @@ abstract contract BaseTemplateHook is BaseHook, TemplateEvents {
 
     bytes32 public supportedPoolId;
 
+    // Base config update staging state.
     bytes32 public pendingConfigHash;
     uint64 public pendingConfigEta;
+    // Template-specific config staging state.
+    bytes32 public pendingTemplateConfigHash;
+    uint64 public pendingTemplateConfigEta;
 
     uint256 private _hookLock;
 
@@ -75,13 +79,13 @@ abstract contract BaseTemplateHook is BaseHook, TemplateEvents {
     function scheduleBaseConfigUpdate(BaseTemplateConfig calldata newConfig) external onlyAdmin {
         _validateBaseConfig(newConfig);
         bytes32 configHash = keccak256(abi.encode(newConfig));
-        _stageConfigHash(configHash);
+        _stageBaseConfigHash(configHash);
     }
 
     function applyBaseConfigUpdate(BaseTemplateConfig calldata newConfig) external onlyAdmin {
         _validateBaseConfig(newConfig);
         bytes32 configHash = keccak256(abi.encode(newConfig));
-        _consumeStagedConfigHash(configHash);
+        _consumeStagedBaseConfigHash(configHash);
         baseConfig = newConfig;
         emit ConfigUpdated(_templateId(), supportedPoolId, configHash, block.timestamp);
     }
@@ -89,6 +93,8 @@ abstract contract BaseTemplateHook is BaseHook, TemplateEvents {
     function cancelStagedConfig() external onlyAdmin {
         delete pendingConfigHash;
         delete pendingConfigEta;
+        delete pendingTemplateConfigHash;
+        delete pendingTemplateConfigEta;
     }
 
     function getHookPermissions() public pure virtual override returns (Hooks.Permissions memory) {
@@ -159,15 +165,6 @@ abstract contract BaseTemplateHook is BaseHook, TemplateEvents {
         TemplateGuards.updateAfterSwap(state, tradeSize);
     }
 
-    function _extractActor(address sender, bytes calldata hookData) internal pure returns (address actor) {
-        actor = sender;
-        if (hookData.length >= 20) {
-            assembly ("memory-safe") {
-                actor := shr(96, calldataload(hookData.offset))
-            }
-        }
-    }
-
     function _readCurrentTick(PoolId poolId) internal view returns (int24 tick) {
         (, tick,,) = poolManager.getSlot0(poolId);
     }
@@ -189,12 +186,12 @@ abstract contract BaseTemplateHook is BaseHook, TemplateEvents {
         emit GuardTriggered(_templateId(), PoolId.unwrap(poolId), guard, contextValue);
     }
 
-    function _stageConfigHash(bytes32 configHash) internal {
+    function _stageBaseConfigHash(bytes32 configHash) internal {
         pendingConfigHash = configHash;
         pendingConfigEta = uint64(block.timestamp + baseConfig.configUpdateDelay);
     }
 
-    function _consumeStagedConfigHash(bytes32 configHash) internal {
+    function _consumeStagedBaseConfigHash(bytes32 configHash) internal {
         if (pendingConfigHash == bytes32(0) || pendingConfigHash != configHash) {
             revert GuardViolation("CONFIG_HASH_MISMATCH");
         }
@@ -204,6 +201,23 @@ abstract contract BaseTemplateHook is BaseHook, TemplateEvents {
 
         delete pendingConfigHash;
         delete pendingConfigEta;
+    }
+
+    function _stageTemplateConfigHash(bytes32 configHash) internal {
+        pendingTemplateConfigHash = configHash;
+        pendingTemplateConfigEta = uint64(block.timestamp + baseConfig.configUpdateDelay);
+    }
+
+    function _consumeStagedTemplateConfigHash(bytes32 configHash) internal {
+        if (pendingTemplateConfigHash == bytes32(0) || pendingTemplateConfigHash != configHash) {
+            revert GuardViolation("CONFIG_HASH_MISMATCH");
+        }
+        if (block.timestamp < pendingTemplateConfigEta) {
+            revert GuardViolation("CONFIG_DELAY_ACTIVE");
+        }
+
+        delete pendingTemplateConfigHash;
+        delete pendingTemplateConfigEta;
     }
 
     function _revertGuard(bytes32 guardCode) internal pure {

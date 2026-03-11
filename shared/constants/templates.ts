@@ -57,7 +57,7 @@ export const TEMPLATE_DEFAULTS = {
 
 export const KNOWN_ADDRESSES = {
   baseSepolia: {
-    factory: process.env.VITE_TEMPLATE_FACTORY_ADDRESS as `0x${string}` | undefined,
-    poolManager: process.env.VITE_POOL_MANAGER_ADDRESS as `0x${string}` | undefined,
+    factory: undefined as `0x${string}` | undefined,
+    poolManager: undefined as `0x${string}` | undefined,
   },
 };

@@ -7,6 +7,7 @@ import {BaseTemplateTest} from "./BaseTemplateTest.t.sol";
 import {TemplateDeployers} from "./TemplateDeployers.sol";
 import {LongTailTemplateHook} from "../src/hooks/LongTailTemplateHook.sol";
 import {LongTailTemplateConfig} from "../src/framework/TemplateTypes.sol";
+import {InvalidConfig} from "../src/framework/TemplateErrors.sol";
 
 contract LongTailTemplateHookTest is BaseTemplateTest, TemplateDeployers {
     LongTailTemplateHook internal hook;
@@ -49,5 +50,29 @@ contract LongTailTemplateHookTest is BaseTemplateTest, TemplateDeployers {
 
         assertFalse(hook.launchMode());
         assertEq(hook.lastAppliedFee(), cfg.normalFee);
+    }
+
+    function test_ModeTransitionsByVolumeAndUpdatesFee() public {
+        LongTailTemplateConfig memory cfg = defaultLongTailConfig();
+        cfg.initialMaxTrade = 100_000 ether;
+        cfg.launchDuration = 12 hours;
+        cfg.volumeTransitionThreshold = 1_000 ether;
+
+        hook.scheduleTemplateConfigUpdate(cfg);
+        hook.applyTemplateConfigUpdate(cfg);
+
+        _swapExactIn(alice, 2_000 ether, true, bytes(""));
+
+        assertFalse(hook.launchMode());
+        assertEq(hook.lastAppliedFee(), cfg.normalFee);
+    }
+
+    function test_InvalidLaunchTradePathReverts() public {
+        LongTailTemplateConfig memory cfg = defaultLongTailConfig();
+        cfg.initialMaxTrade = 100_000 ether;
+        cfg.finalMaxTrade = 50_000 ether;
+
+        vm.expectRevert(abi.encodeWithSelector(InvalidConfig.selector, bytes32("LONGTAIL_MAX_TRADE_PATH")));
+        hook.scheduleTemplateConfigUpdate(cfg);
     }
 }
