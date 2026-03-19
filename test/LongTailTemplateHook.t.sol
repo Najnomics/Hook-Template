@@ -75,4 +75,37 @@ contract LongTailTemplateHookTest is BaseTemplateTest, TemplateDeployers {
         vm.expectRevert(abi.encodeWithSelector(InvalidConfig.selector, bytes32("LONGTAIL_MAX_TRADE_PATH")));
         hook.scheduleTemplateConfigUpdate(cfg);
     }
+
+    function test_InvalidFeeOrderReverts() public {
+        LongTailTemplateConfig memory cfg = defaultLongTailConfig();
+        cfg.launchFee = cfg.normalFee - 1;
+
+        vm.expectRevert(abi.encodeWithSelector(InvalidConfig.selector, bytes32("LONGTAIL_FEE_ORDER")));
+        hook.scheduleTemplateConfigUpdate(cfg);
+    }
+
+    function test_InvalidLaunchDurationReverts() public {
+        LongTailTemplateConfig memory cfg = defaultLongTailConfig();
+        cfg.launchDuration = 0;
+
+        vm.expectRevert(abi.encodeWithSelector(InvalidConfig.selector, bytes32("LONGTAIL_DURATION")));
+        hook.scheduleTemplateConfigUpdate(cfg);
+    }
+
+    function test_SegmentedOrderFlowRequiresCap() public {
+        LongTailTemplateConfig memory cfg = defaultLongTailConfig();
+        cfg.segmentedOrderFlow = true;
+        cfg.perBlockVolumeCap = 0;
+
+        vm.expectRevert(abi.encodeWithSelector(InvalidConfig.selector, bytes32("LONGTAIL_PER_BLOCK_CAP")));
+        hook.scheduleTemplateConfigUpdate(cfg);
+    }
+
+    function test_VolumeThresholdRequired() public {
+        LongTailTemplateConfig memory cfg = defaultLongTailConfig();
+        cfg.volumeTransitionThreshold = 0;
+
+        vm.expectRevert(abi.encodeWithSelector(InvalidConfig.selector, bytes32("LONGTAIL_VOLUME_THRESHOLD")));
+        hook.scheduleTemplateConfigUpdate(cfg);
+    }
 }

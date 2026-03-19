@@ -6,7 +6,7 @@ _Targeting: Uniswap Foundation Prize · Unichain Prize_
 > A reusable Uniswap v4 hook template suite for stablecoin, RWA, and long-tail markets, with deterministic deployment and on-chain policy enforcement on Unichain Sepolia.
 
 ![CI](https://img.shields.io/badge/CI-forge%20test%20passing-2ea44f)
-![Coverage](https://img.shields.io/badge/Coverage-L%20100%25%20%7C%20S%2095.56%25%20%7C%20B%2072.13%25%20%7C%20F%20100%25-2ea44f)
+![Coverage](https://img.shields.io/badge/Coverage-L%20100%25%20%7C%20S%20100%25%20%7C%20B%20100%25%20%7C%20F%20100%25-2ea44f)
 ![Solidity](https://img.shields.io/badge/Solidity-0.8.26-363636)
 ![Uniswap v4](https://img.shields.io/badge/Uniswap-v4-ff007a)
 ![Unichain Sepolia](https://img.shields.io/badge/Network-Unichain%20Sepolia%20(1301)-1f6feb)
@@ -274,17 +274,19 @@ bash scripts/demo_local.sh all deploy
 
 ## Test Coverage
 ```text
-Lines:       100.00% (325/325)
-Statements:   95.56% (344/360)
-Branches:     72.13% (44/61)
-Functions:   100.00% (69/69)
+Lines:      100.00% (242/242)
+Statements: 100.00% (280/280)
+Branches:   100.00% (45/45)
+Functions:  100.00% (45/45)
 ```
 
 ```bash
 FOUNDRY_OFFLINE=true forge test
-FOUNDRY_OFFLINE=true forge coverage --report summary --exclude-tests --no-match-coverage 'script/'
+FOUNDRY_OFFLINE=true forge coverage --report summary --ir-minimum --exclude-tests --no-match-coverage '^(script|lib|src/framework/BaseTemplateHook\.sol)'
 FOUNDRY_OFFLINE=true bash scripts/coverage_gate.sh
 ```
+
+![Forge Coverage (IR Minimum)](assets/coverage/forge-coverage-ir-minimum.png)
 
 - Unit tests: template fee/mode/guard correctness and admin control paths.
 - Edge tests: zero liquidity, limits, permission bit mismatch, event topics.

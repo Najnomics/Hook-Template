@@ -10,7 +10,7 @@ import {BaseTemplateTest} from "./BaseTemplateTest.t.sol";
 import {TemplateDeployers} from "./TemplateDeployers.sol";
 import {RWATemplateHook} from "../src/hooks/RWATemplateHook.sol";
 import {RWATemplateConfig} from "../src/framework/TemplateTypes.sol";
-import {Unauthorized, GuardViolation} from "../src/framework/TemplateErrors.sol";
+import {Unauthorized, GuardViolation, InvalidConfig} from "../src/framework/TemplateErrors.sol";
 
 contract RWATemplateHookTest is BaseTemplateTest, TemplateDeployers {
     RWATemplateHook internal hook;
@@ -157,6 +157,38 @@ contract RWATemplateHookTest is BaseTemplateTest, TemplateDeployers {
 
         _swapExactIn(alice, 6_000 ether, true, bytes(""));
         assertEq(hook.lastAppliedFee(), 4_000);
+    }
+
+    function test_InvalidMaxTickJumpReverts() public {
+        RWATemplateConfig memory cfg = defaultRWAConfig();
+        cfg.maxTickJump = 0;
+
+        vm.expectRevert(abi.encodeWithSelector(InvalidConfig.selector, bytes32("RWA_MAX_TICK_JUMP")));
+        hook.scheduleTemplateConfigUpdate(cfg);
+    }
+
+    function test_InvalidSlippageBoundsRevert() public {
+        RWATemplateConfig memory cfg = defaultRWAConfig();
+        cfg.maxSlippageBps = 0;
+        vm.expectRevert(abi.encodeWithSelector(InvalidConfig.selector, bytes32("RWA_MAX_SLIPPAGE")));
+        hook.scheduleTemplateConfigUpdate(cfg);
+
+        cfg = defaultRWAConfig();
+        cfg.maxSlippageBps = 10_001;
+        vm.expectRevert(abi.encodeWithSelector(InvalidConfig.selector, bytes32("RWA_MAX_SLIPPAGE")));
+        hook.scheduleTemplateConfigUpdate(cfg);
+    }
+
+    function test_InvalidSessionBoundsRevert() public {
+        RWATemplateConfig memory cfg = defaultRWAConfig();
+        cfg.sessionOpenSeconds = 1 days;
+        vm.expectRevert(abi.encodeWithSelector(InvalidConfig.selector, bytes32("RWA_SESSION")));
+        hook.scheduleTemplateConfigUpdate(cfg);
+
+        cfg = defaultRWAConfig();
+        cfg.sessionCloseSeconds = 1 days;
+        vm.expectRevert(abi.encodeWithSelector(InvalidConfig.selector, bytes32("RWA_SESSION")));
+        hook.scheduleTemplateConfigUpdate(cfg);
     }
 
     function _setLastObservedTick(int24 observed) internal {

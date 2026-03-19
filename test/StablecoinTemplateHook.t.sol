@@ -115,6 +115,11 @@ contract StablecoinTemplateHookTest is BaseTemplateTest, TemplateDeployers {
         assertEq(hook.admin(), bob);
     }
 
+    function test_SetAdminZeroReverts() public {
+        vm.expectRevert(abi.encodeWithSelector(InvalidConfig.selector, bytes32("ADMIN")));
+        hook.setAdmin(address(0));
+    }
+
     function test_CancelStagedConfigClearsBaseAndTemplate() public {
         StablecoinTemplateConfig memory cfg = defaultStablecoinConfig();
         cfg.extremeFee = 3_500;
@@ -248,6 +253,38 @@ contract StablecoinTemplateHookTest is BaseTemplateTest, TemplateDeployers {
 
         vm.expectRevert(abi.encodeWithSelector(InvalidConfig.selector, bytes32("STABLE_VOL_THRESHOLD")));
         hook.scheduleTemplateConfigUpdate(cfg);
+    }
+
+    function test_InvalidBaseConfigFieldsRevert() public {
+        StablecoinTemplateConfig memory cfg = defaultStablecoinConfig();
+        cfg.base.maxTradeSize = 0;
+        vm.expectRevert(abi.encodeWithSelector(InvalidConfig.selector, bytes32("MAX_TRADE")));
+        hook.scheduleTemplateConfigUpdate(cfg);
+
+        cfg = defaultStablecoinConfig();
+        cfg.base.rateLimitWindow = 0;
+        vm.expectRevert(abi.encodeWithSelector(InvalidConfig.selector, bytes32("RATE_WINDOW")));
+        hook.scheduleTemplateConfigUpdate(cfg);
+
+        cfg = defaultStablecoinConfig();
+        cfg.base.maxSwapsPerWindow = 0;
+        vm.expectRevert(abi.encodeWithSelector(InvalidConfig.selector, bytes32("MAX_SWAPS")));
+        hook.scheduleTemplateConfigUpdate(cfg);
+
+        cfg = defaultStablecoinConfig();
+        cfg.base.configUpdateDelay = 7 days + 1;
+        vm.expectRevert(abi.encodeWithSelector(InvalidConfig.selector, bytes32("CONFIG_DELAY")));
+        hook.scheduleTemplateConfigUpdate(cfg);
+    }
+
+    function test_ConstructorZeroAdminReverts() public {
+        StablecoinTemplateConfig memory cfg = defaultStablecoinConfig();
+        bytes memory constructorArgs = abi.encode(IPoolManager(address(manager)), address(0), cfg);
+        (, bytes32 salt) =
+            HookMiner.find(address(this), LOCAL_TEMPLATE_FLAGS, type(StablecoinTemplateHook).creationCode, constructorArgs);
+
+        vm.expectRevert(abi.encodeWithSelector(InvalidConfig.selector, bytes32("ADMIN")));
+        new StablecoinTemplateHook{salt: salt}(IPoolManager(address(manager)), address(0), cfg);
     }
 
     function test_StressBandFeeSelectedWithoutExtremeDeviation() public {

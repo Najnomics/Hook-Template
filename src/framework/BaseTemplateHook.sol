@@ -46,7 +46,7 @@ abstract contract BaseTemplateHook is BaseHook, TemplateEvents {
     uint256 private _hookLock;
 
     modifier onlyAdmin() {
-        if (msg.sender != admin) revert Unauthorized(msg.sender);
+        _requireAdmin();
         _;
     }
 
@@ -97,23 +97,10 @@ abstract contract BaseTemplateHook is BaseHook, TemplateEvents {
         delete pendingTemplateConfigEta;
     }
 
-    function getHookPermissions() public pure virtual override returns (Hooks.Permissions memory) {
-        return Hooks.Permissions({
-            beforeInitialize: false,
-            afterInitialize: true,
-            beforeAddLiquidity: false,
-            afterAddLiquidity: false,
-            beforeRemoveLiquidity: false,
-            afterRemoveLiquidity: false,
-            beforeSwap: true,
-            afterSwap: true,
-            beforeDonate: false,
-            afterDonate: false,
-            beforeSwapReturnDelta: false,
-            afterSwapReturnDelta: false,
-            afterAddLiquidityReturnDelta: false,
-            afterRemoveLiquidityReturnDelta: false
-        });
+    function getHookPermissions() public pure virtual override returns (Hooks.Permissions memory permissions) {
+        permissions.afterInitialize = true;
+        permissions.beforeSwap = true;
+        permissions.afterSwap = true;
     }
 
     function _afterInitialize(address, PoolKey calldata key, uint160, int24)
@@ -137,6 +124,10 @@ abstract contract BaseTemplateHook is BaseHook, TemplateEvents {
         if (cfg.rateLimitWindow == 0) revert InvalidConfig(FIELD_RATE_WINDOW);
         if (cfg.maxSwapsPerWindow == 0) revert InvalidConfig(FIELD_MAX_SWAPS);
         if (cfg.configUpdateDelay > MAX_CONFIG_DELAY) revert InvalidConfig(FIELD_CONFIG_DELAY);
+    }
+
+    function _requireAdmin() internal view {
+        if (msg.sender != admin) revert Unauthorized(msg.sender);
     }
 
     function _assertSupportedPool(PoolKey calldata key) internal view returns (PoolId poolId) {

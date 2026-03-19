@@ -13,6 +13,7 @@ out = "out"
 script = "script"
 src = "src"
 test = "test"
+no_match_coverage = "^(script|lib)/"
 optimizer = true
 optimizer_runs = 10000
 via_ir = false

@@ -29,6 +29,8 @@ abstract contract BaseTemplateTest is Test {
 
     Currency internal currency0;
     Currency internal currency1;
+    bool internal forceBootstrapSwap;
+    bool internal lastBootstrapSwapped;
 
     PoolKey internal poolKey;
     PoolId internal poolId;
@@ -41,6 +43,7 @@ abstract contract BaseTemplateTest is Test {
     int24 internal constant TICK_UPPER = 120;
 
     function _bootstrapCore() internal {
+        lastBootstrapSwapped = false;
         manager = new PoolManager(address(this));
         swapRouter = new PoolSwapTest(manager);
         liquidityRouter = new PoolModifyLiquidityTest(manager);
@@ -48,7 +51,8 @@ abstract contract BaseTemplateTest is Test {
         token0 = new MockERC20("Token0", "TK0", 18);
         token1 = new MockERC20("Token1", "TK1", 18);
 
-        if (address(token0) > address(token1)) {
+        if (forceBootstrapSwap || address(token0) > address(token1)) {
+            lastBootstrapSwapped = true;
             (token0, token1) = (token1, token0);
         }
 
@@ -62,6 +66,10 @@ abstract contract BaseTemplateTest is Test {
         token1.approve(address(liquidityRouter), type(uint256).max);
         token0.approve(address(swapRouter), type(uint256).max);
         token1.approve(address(swapRouter), type(uint256).max);
+    }
+
+    function _setForceBootstrapSwap(bool forced) internal {
+        forceBootstrapSwap = forced;
     }
 
     function _initializePool(IHooks hook, uint128 liquidity) internal {
